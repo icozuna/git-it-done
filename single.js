@@ -1,4 +1,5 @@
 var issueContainterEl = document.querySelector("#issues-container");
+var limitWarningEl = document.querySelector("#limit-warning");
 var getRepoIssues = function (repo) {
   console.log(repo);
   var apiUrl = "https://api.github.com/repos/" + repo + "/issues?direction=asc";
@@ -8,6 +9,9 @@ var getRepoIssues = function (repo) {
     if (response.ok) {
       response.json().then(function (data) {
         displayIssues(data);
+        if (response.headers.get("Link")) {
+          displayWarning(repo);
+        }
       });
     } else {
       alert("There was a problem with your request.");
@@ -50,4 +54,16 @@ var displayIssues = function (issues) {
   }
 };
 
-getRepoIssues("icozuna/run-buddy");
+var displayWarning = function (repo) {
+  //add text to warning container
+  limitWarningEl.textContent = "To see more than 30 issues, visit";
+  var linkEl = document.createElement("a");
+  linkEl.textContent = "See more issues on Github.com";
+  linkEl.setAttribute("href", "https://github.com/" + repo + "/issues");
+  linkEl.setAttribute("target", "_blank");
+
+  //append to warning container
+  limitWarningEl.appendChild(linkEl);
+};
+
+getRepoIssues("facebook/react");
